@@ -1,3 +1,4 @@
+-- Testesd on PG 13.11
 -- SQL snippet demonstrating the relationship between access method, strategy number and operator class
 -- Reference: https://www.postgresql.org/docs/current/xindex.html#XINDEX-HASH-STRAT-TABLE
 CREATE FUNCTION inverted_btint4cmp(int4, int4) RETURNS integer
