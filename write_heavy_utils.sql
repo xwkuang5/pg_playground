@@ -33,3 +33,16 @@ BEGIN
     return true;
 END;
 $$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION do_transaction_optimistically(table_id int, is_write boolean, value int) RETURNS boolean
+AS $$
+#print_strict_params on
+BEGIN
+    return do_transaction(table_id, is_write, value);
+EXCEPTION
+    WHEN undefined_table THEN
+        PERFORM pg_advisory_xact_lock(table_id);
+        EXECUTE 'CREATE TABLE IF NOT EXISTS ' || table_id_to_table_name(table_id) || '(id serial PRIMARY KEY, value int)';
+        return do_transaction(table_id, is_write, value);
+END;
+$$ LANGUAGE plpgsql;
